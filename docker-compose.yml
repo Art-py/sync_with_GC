@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: /app/entrypoint.sh
+    networks:
+      - postgresnet
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16.1-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - postgresnet
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    env_file:
+      - .env
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    networks:
+      - postgresnet
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+networks:
+  postgresnet:
+
+volumes:
+  postgres_data:
+  pgadmin:
