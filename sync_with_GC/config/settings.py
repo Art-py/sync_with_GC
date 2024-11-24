@@ -14,6 +14,8 @@ from pathlib import Path
 
 import os
 
+# from logs.utils import DatabaseLogHandler
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
+    'logs.apps.LogsConfig',
 ]
 
 MIDDLEWARE = [
@@ -85,6 +88,31 @@ DATABASES = {
         'HOST': os.environ.get('SQL_HOST', 'localhost'),
         'PORT': os.environ.get('SQL_PORT', '5432'),
     }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'format': '%(asctime)s %(levelname)s %(message)s %(name)s %(pathname)s %(funcName)s',
+        },
+    },
+    'handlers': {
+        'db': {
+            'level': 'INFO',
+            'class': 'logs.utils.DatabaseLogHandler',
+            'formatter': 'json',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['db'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
 }
 
 
